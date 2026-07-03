@@ -48,55 +48,89 @@ export default function AnalysisPage() {
 
   const progress = Math.round(((currentStep + 1) / ANALYSIS_STEPS.length) * 100);
 
+  const MOCK_LOGS = [
+    `[INFO] Initializing CDIP AI engine v2.0...`,
+    `[LOAD] Parsing profile credentials for student: ${profile?.name || 'User'}`,
+    `[PARSE] Mapping department: "${profile?.department}" curriculum constraints`,
+    `[SEARCH] Querying national placement index for target role: "${selectedGoal}"`,
+    `[MATCH] Aligning student skill tier "${profile?.skillLevel}" with market benchmarks`,
+    `[MODEL] Calculating priority weights for "Must Learn" and "Advanced" categories`,
+    `[PREDICT] Matching career goal "${selectedGoal}" vectors (87% confidence)`,
+    `[GRAPH] Constructing personalized linear learning roadmap (5 key phases)`,
+    `[GENERATE] Preparing smart contextual mentor guidelines...`,
+    `[SUCCESS] Career intelligence vector compilation successful.`
+  ];
+
   if (phase === 'loading') {
     return (
-      <div className="w-full max-w-lg mx-auto">
+      <div className="w-full max-w-2xl mx-auto space-y-6">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="text-center"
         >
-          {/* Animated orb */}
-          <div className="relative w-32 h-32 mx-auto mb-10">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 animate-pulse-slow opacity-20 scale-125" />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 animate-pulse opacity-40 scale-110" />
-            <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-300 dark:shadow-indigo-900">
-              <span className="text-5xl">
-                {ANALYSIS_STEPS[currentStep]?.icon || '🤖'}
+          {/* Glowing Scanner & AI Brain */}
+          <div className="relative w-36 h-36 mx-auto mb-8">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-500 animate-spin-slow opacity-30 scale-125 blur-md" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 animate-pulse opacity-50 scale-110" />
+            <div className="relative w-36 h-36 rounded-full bg-slate-900 border-2 border-indigo-500/50 flex flex-col items-center justify-center shadow-2xl overflow-hidden">
+              <span className="text-4xl mb-1 animate-pulse">🧠</span>
+              <span className="text-[10px] font-mono text-indigo-400 font-bold uppercase tracking-widest animate-pulse">
+                AI SCANNING
               </span>
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-indigo-400 to-transparent animate-bounce w-full" style={{ animationDuration: '2s' }} />
             </div>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-3">
-            Building Your Roadmap
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+            AI Engine Analysis In Progress
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mb-10">
-            Our AI is analyzing your profile and creating your personalized career plan...
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
+            Our machine learning model is synthesizing your department syllabus with the selected career vectors.
           </p>
 
-          {/* Progress */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 mb-6">
-            <ProgressBar value={progress} max={100} color="indigo" size="md" className="mb-5" />
-            <div className="flex flex-col gap-2.5">
-              {ANALYSIS_STEPS.map((step, i) => (
-                <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0.3 }}
-                  animate={{ opacity: i <= currentStep ? 1 : 0.3 }}
-                  className="flex items-center gap-3"
-                >
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${i < currentStep ? 'bg-emerald-500 text-white text-xs' : i === currentStep ? 'bg-indigo-600 text-white pulse-glow' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                    {i < currentStep ? '✓' : i === currentStep ? <span className="w-2 h-2 bg-white rounded-full animate-pulse" /> : ''}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {/* Left: Progress Checklist */}
+            <div className="md:col-span-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 text-left">
+              <ProgressBar value={progress} max={100} color="indigo" size="md" className="mb-4" />
+              <div className="space-y-2.5">
+                {ANALYSIS_STEPS.map((step, i) => (
+                  <div
+                    key={step.id}
+                    className={`flex items-center gap-3 transition-opacity duration-300 ${i <= currentStep ? 'opacity-100' : 'opacity-30'}`}
+                  >
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold ${i < currentStep ? 'bg-emerald-500 text-white' : i === currentStep ? 'bg-indigo-600 text-white animate-pulse' : 'bg-slate-200 dark:bg-slate-700 text-slate-400'}`}>
+                      {i < currentStep ? '✓' : '●'}
+                    </div>
+                    <span className={`text-xs ${i <= currentStep ? 'text-slate-800 dark:text-slate-200 font-semibold' : 'text-slate-400'}`}>
+                      {step.label}
+                    </span>
                   </div>
-                  <span className={`text-sm transition-colors duration-300 ${i <= currentStep ? 'text-slate-800 dark:text-slate-200 font-medium' : 'text-slate-400'}`}>
-                    {step.label}
-                  </span>
-                </motion.div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Real-time System Log Terminal */}
+            <div className="md:col-span-2 bg-slate-950 rounded-2xl border border-slate-800 p-4 text-left font-mono text-[10px] text-indigo-400 overflow-hidden shadow-inner h-[210px] flex flex-col justify-end">
+              <div className="border-b border-slate-900 pb-2 mb-2 flex items-center justify-between text-slate-600">
+                <span>CON_SHELL: cdip_model.sh</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              </div>
+              <div className="space-y-1.5 overflow-y-auto max-h-[170px] no-scrollbar">
+                {MOCK_LOGS.slice(0, currentStep + 2).map((log, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className={`${index === currentStep + 1 ? 'text-teal-400 font-bold' : 'text-slate-500'}`}
+                  >
+                    {log}
+                  </motion.div>
+                ))}
+                <div className="w-1 h-3 bg-indigo-400 animate-pulse inline-block" />
+              </div>
             </div>
           </div>
-
-          <p className="text-xs text-slate-400">This takes about 5 seconds...</p>
         </motion.div>
       </div>
     );

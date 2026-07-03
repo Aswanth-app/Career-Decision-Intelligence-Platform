@@ -13,6 +13,8 @@ import { CardSkeleton } from '../components/ui/States';
 export default function DashboardPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [advisorAdvice, setAdvisorAdvice] = useState('');
+  const [isRecalibrating, setIsRecalibrating] = useState(false);
   const { profile, selectedGoal, roadmap } = useAppState();
   const navigate = useNavigate();
 
@@ -35,8 +37,23 @@ export default function DashboardPage() {
     const res = await dashboardService.get();
     if (!res.error) {
       setData(res.data);
+      setAdvisorAdvice(res.data.aiSuggestion);
     }
     setLoading(false);
+  };
+
+  const handleRecalibrate = async () => {
+    setIsRecalibrating(true);
+    await new Promise((r) => setTimeout(r, 1500));
+    const tips = [
+      `Based on your active ${selectedGoal?.title || 'Software Engineer'} path, prioritize building 2 mini-projects to reinforce current milestone skills.`,
+      `Your current weekly commitment of ${profile?.weeklyHours || '5-10'}h is optimal. Try to unlock the next roadmap step by this weekend.`,
+      `Placement metrics indicate strong demand for Git/GitHub workflows. Make sure your local profile repositories are public and active.`,
+      `AI Check: You have completed ${roadmap?.filter((s) => s.status === 'completed')?.length || 0} steps. Let's schedule a mock chat session in the AI Mentor tab to review.`
+    ];
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    setAdvisorAdvice(randomTip);
+    setIsRecalibrating(false);
   };
 
   if (loading || !data) {
@@ -136,32 +153,61 @@ export default function DashboardPage() {
             </CardBody>
           </Card>
 
-          {/* AI Advisor Panel */}
-          <Card className="border-purple-100 dark:border-purple-950/50 bg-white dark:bg-slate-800">
-            <CardBody className="p-6">
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md flex-shrink-0">
-                  🤖
+          {/* Premium Glowing AI Advisor Panel */}
+          <div className="p-[1.5px] bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-500 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="bg-white dark:bg-slate-900 rounded-[22px] p-6 relative overflow-hidden">
+              {/* Subtle mesh background inside card */}
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-950/20 dark:to-purple-950/20 pointer-events-none" />
+              
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4 relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md flex-shrink-0 animate-pulse-slow">
+                  ✨
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-slate-950 dark:text-white text-base">AI Career Mentor Suggestion</h3>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wider">
-                      Contextualized
-                    </span>
+                <div className="flex-1 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-slate-950 dark:text-white text-base">AI Career Advisor Console</h3>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest">
+                        ACTIVE STREAM
+                      </span>
+                    </div>
+                    <Button
+                      id="dashboard-recalibrate-btn"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRecalibrate}
+                      loading={isRecalibrating}
+                      className="text-xs py-1"
+                    >
+                      Regenerate Advice
+                    </Button>
                   </div>
-                  <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic">
-                    "{data.aiSuggestion}"
-                  </p>
-                  <div className="pt-1 flex items-center gap-3">
-                    <Link to="/mentor" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 inline-flex items-center gap-1">
-                      Ask Mentor for clarification <ChevronRight size={14} />
+                  
+                  {isRecalibrating ? (
+                    <div className="space-y-2 py-1">
+                      <div className="h-3 w-5/6 bg-slate-200 dark:bg-slate-800 rounded shimmer" />
+                      <div className="h-3 w-2/3 bg-slate-200 dark:bg-slate-800 rounded shimmer" />
+                    </div>
+                  ) : (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic"
+                    >
+                      "{advisorAdvice}"
+                    </motion.p>
+                  )}
+
+                  <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-100 dark:border-slate-800/80">
+                    <Link to="/mentor" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 inline-flex items-center gap-1">
+                      Start full session with AI Mentor <ChevronRight size={14} />
                     </Link>
+                    <span className="text-[10px] text-slate-400">Model: Gemini-CDIP-v2</span>
                   </div>
                 </div>
               </div>
-            </CardBody>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Right Column: Roadmap Overview & Next Milestone */}
