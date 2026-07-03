@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import { cn } from '../../utils';
+
 
 export function PageHeader({ title, subtitle, badge, actions, className }) {
   return (
@@ -137,6 +139,33 @@ export function SkillCard({ skill, isCompleted = false, onComplete, className })
 }
 
 export function AIChatBubble({ message, isUser = false, timestamp, isLoading = false }) {
+  const [displayedText, setDisplayedText] = useState(isUser ? message : '');
+
+  useEffect(() => {
+    if (isUser || isLoading || !message) {
+      setDisplayedText(message);
+      return;
+    }
+
+    // Typing streaming effect for AI response
+    let words = message.split(' ');
+    let current = '';
+    let i = 0;
+    setDisplayedText('');
+
+    const timer = setInterval(() => {
+      if (i < words.length) {
+        current += (i === 0 ? '' : ' ') + words[i];
+        setDisplayedText(current);
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, 35); // 35ms per word feels very natural
+
+    return () => clearInterval(timer);
+  }, [message, isUser, isLoading]);
+
   return (
     <div className={cn('flex gap-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
       {!isUser && (
@@ -158,7 +187,7 @@ export function AIChatBubble({ message, isUser = false, timestamp, isLoading = f
               <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           ) : (
-            <div className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+            <div className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: displayedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
           )}
         </div>
         {timestamp && (
