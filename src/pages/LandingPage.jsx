@@ -94,15 +94,7 @@ export default function LandingPage() {
               </Link>
             </motion.div>
 
-            <motion.p
-              initial="hidden"
-              animate="show"
-              variants={fadeUp}
-              custom={4}
-              className="mt-6 text-sm text-slate-400 dark:text-slate-500"
-            >
-              Free for all engineering students · No credit card required
-            </motion.p>
+
           </div>
 
           {/* Dashboard Preview */}
